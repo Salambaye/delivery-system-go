@@ -1,9 +1,9 @@
 package main
 
 import (
-	"errors" // Pour gérer les erreurs
-	"fmt"    // Pour afficher du texte dans la console
-	"time"   // Pour simuler le temps de livraison
+	"errors"
+	"fmt"
+	"time"
 )
 
 // ===================== INTERFACE TRANSPORT =====================
@@ -16,67 +16,75 @@ type TransportMethod interface {
 // ===================== STRUCTURES DES TRANSPORTS =====================
 // 🚛 Camion
 type Truck struct {
-	ID       string // Identifiant du camion
-	Capacity int    // Capacité en nombre de colis
+	ID       string
+	Capacity int
 }
 
-// Méthode de livraison pour un camion
 func (t Truck) DeliverPackage(destination string) (string, error) {
-	time.Sleep(3 * time.Second) // Simule un temps de transport de 3 secondes
+	time.Sleep(3 * time.Second) // Simulation d'une livraison lente
 	return fmt.Sprintf("Truck %s (capacité %d) a livré le colis à %s", t.ID, t.Capacity, destination), nil
 }
 
-// Retourne l'état du camion
 func (t Truck) GetStatus() string {
 	return "Camion prêt"
 }
 
 // 🚁 Drone
 type Drone struct {
-	ID      string // Identifiant du drone
-	Battery int    // Niveau de batterie (en %)
+	ID      string
+	Battery int
 }
 
-// Méthode de livraison pour un drone
 func (d Drone) DeliverPackage(destination string) (string, error) {
 	// Vérifie si la batterie est suffisante
 	if d.Battery < 20 {
 		return "", errors.New("Drone à court de batterie, livraison annulée")
 	}
-	time.Sleep(1 * time.Second) // Livraison rapide en 1 seconde
+	time.Sleep(1 * time.Second) // Livraison rapide
 	return fmt.Sprintf("Drone %s a livré le colis à %s", d.ID, destination), nil
 }
 
-// Retourne l'état du drone
 func (d Drone) GetStatus() string {
 	return "Drone prêt"
 }
 
 // 🚢 Bateau
 type Boat struct {
-	ID      string // Identifiant du bateau
-	Weather string // Météo actuelle ("Clear" ou "Storm")
+	ID      string
+	Weather string
 }
 
-// Méthode de livraison pour un bateau
 func (b Boat) DeliverPackage(destination string) (string, error) {
 	// Vérifie si la météo permet la navigation
 	if b.Weather == "Storm" {
 		return "", errors.New("Tempête détectée, livraison annulée")
 	}
-	time.Sleep(5 * time.Second) // Livraison plus lente en 5 secondes
+	time.Sleep(5 * time.Second) // Livraison plus lente
 	return fmt.Sprintf("Boat %s a livré le colis à %s", b.ID, destination), nil
 }
 
-// Retourne l'état du bateau
 func (b Boat) GetStatus() string {
 	return "Bateau prêt"
+}
+
+// ===================== FABRIQUE DE TRANSPORTS =====================
+// Crée un moyen de transport en fonction d'un type donné (truck, drone, boat)
+func GetTransportMethod(method string) (TransportMethod, error) {
+	switch method {
+	case "truck":
+		return Truck{ID: "T123", Capacity: 10}, nil
+	case "drone":
+		return Drone{ID: "D456", Battery: 100}, nil
+	case "boat":
+		return Boat{ID: "B789", Weather: "Clear"}, nil
+	default:
+		return nil, errors.New("méthode de transport inconnue")
+	}
 }
 
 // ===================== FONCTION TRACKING DE LIVRAISON =====================
 // Fonction qui suit une livraison et envoie le résultat dans un channel
 func TrackDelivery(transport TransportMethod, destination string, ch chan string) {
-	// Tente d'effectuer la livraison
 	status, err := transport.DeliverPackage(destination)
 	if err != nil {
 		ch <- fmt.Sprintf("Échec de la livraison : %v", err) // Envoie l'erreur au channel
@@ -87,17 +95,23 @@ func TrackDelivery(transport TransportMethod, destination string, ch chan string
 
 // ===================== PROGRAMME PRINCIPAL =====================
 func main() {
-	fmt.Println("Système de suivi des livraisons")
+	fmt.Println("Système de Gestion de Livraison")
 
-	// Création des moyens de transport
-	truck := Truck{ID: "A8U5", Capacity: 5}
-	drone := Drone{ID: "1234N", Battery: 15}  // Batterie faible (échec attendu)
-	boat := Boat{ID: "6TD4G", Weather: "Clear"} // Météo favorable
+	// Création des transports via la fabrique avec gestion des erreurs
+	truck, err1 := GetTransportMethod("truck")
+	drone, err2 := GetTransportMethod("drone")
+	boat, err3 := GetTransportMethod("boat")
 
-	// Création d'un channel pour recevoir les résultats des livraisons
-	ch := make(chan string, 3) // Channel de type string, avec une capacité de 3
+	// Vérification des erreurs
+	if err1 != nil || err2 != nil || err3 != nil {
+		fmt.Println("Erreur lors de la création des transports :", err1, err2, err3)
+		return
+	}
 
-	// Lancer les livraisons en parallèle avec des goroutines
+	// Création d'un channel avec une capacité définie pour éviter le blocage
+	ch := make(chan string, 3)
+
+	// Lancement des livraisons en parallèle avec des goroutines
 	go TrackDelivery(truck, "New York", ch)
 	go TrackDelivery(drone, "Los Angeles", ch)
 	go TrackDelivery(boat, "Paris", ch)
