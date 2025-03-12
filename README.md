@@ -12,6 +12,8 @@ Ce projet est un système de gestion des livraisons implémenté en Go. Il perme
 
 - Les livraisons sont exécutées en parallèle grâce aux goroutines et aux channels, permettant ainsi de suivre les statuts des livraisons en temps réel.
 
+--- 
+
 ## Fonctionnalités
 
 Interface commune TransportMethod pour toutes les méthodes de transport.
@@ -55,14 +57,16 @@ go run main.go
 - Fabrique GetTransportMethod : Permet de créer dynamiquement des objets en fonction d'un type donné.
 
 - Goroutines et Channels : Les livraisons sont exécutées en parallèle et les statuts sont envoyés via un channel.
+  
 
 ### Exemples de Sortie
 
-Truck T123 delivered package to New York
-Drone D456 delivered package to Los Angeles
-Delivery failed: Boat delayed due to bad weather
+- Truck T123 delivered package to New York
+- Drone D456 delivered package to Los Angeles
+- Delivery failed: Boat delayed due to bad weather
 
 ---
+
 ## Améliorations Possibles
 
 - Ajout d'autres moyens de transport (train, avion, vélo).
@@ -73,7 +77,8 @@ Delivery failed: Boat delayed due to bad weather
 
 - Interface utilisateur pour visualiser le suivi des livraisons en temps réel.
 
-  
+---
+
 ## ✍️ **Auteurs**
 👥 **Groupe 4** : 
 
@@ -83,7 +88,7 @@ Delivery failed: Boat delayed due to bad weather
 - Celaire Idriss OKA
 - Khadim Mbacké FALL
 
-Momo
+
 
 Licence
 
