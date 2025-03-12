@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"time"
 )
 
@@ -22,12 +23,12 @@ type Truck struct {
 
 func (t Truck) DeliverPackage(destination string) (string, error) {
 	// Simulation d'une livraison lente
-	time.Sleep(3 * time.Second)
+	time.Sleep(time.Second * time.Duration(rand.Intn(5)+3))
 	return fmt.Sprintf("Truck %s avec une capacité de %d a livré le colis à %s", t.ID, t.Capacity, destination), nil
 }
 
 func (t Truck) GetStatus() string {
-	return "Camion prêt"
+	return fmt.Sprintf("Truck %s is operational with capacity %d", t.ID, t.Capacity)
 }
 
 // Implémentation du drone (Drone)
@@ -46,7 +47,7 @@ func (d Drone) DeliverPackage(destination string) (string, error) {
 }
 
 func (d Drone) GetStatus() string {
-	return "Drone prêt"
+	return fmt.Sprintf("Drone %s est operationel avec %d%% de batterie", d.ID, d.Battery)
 }
 
 // Implémentation du bateau (Boat)
@@ -66,7 +67,7 @@ func (b Boat) DeliverPackage(destination string) (string, error) {
 }
 
 func (b Boat) GetStatus() string {
-	return "Bateau prêt"
+	return fmt.Sprintf("Boat %s est operationel", b.ID)
 }
 
 // Fonction principale pour tester
