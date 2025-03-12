@@ -42,7 +42,7 @@ func (d Drone) DeliverPackage(destination string) (string, error) {
 		return "", errors.New("Drone à court de batterie, la livraison est alors annulée")
 	}
 	time.Sleep(1 * time.Second)
-	return fmt.Sprintf(" Drone %s a livré le colis à %s", d.ID, destination), nil
+	return fmt.Sprintf("Drone %s a livré le colis à %s", d.ID, destination), nil
 }
 
 func (d Drone) GetStatus() string {
@@ -60,7 +60,6 @@ func (b Boat) DeliverPackage(destination string) (string, error) {
 	if b.Weather == "Storm" {
 		return "", errors.New("Tempête détectée donc la livraison est annulée")
 	}
-
 	time.Sleep(5 * time.Second)
 	return fmt.Sprintf("Boat %s a livré le colis à %s", b.ID, destination), nil
 }
@@ -74,21 +73,27 @@ func main() {
 	fmt.Println("Système de Gestion de Livraison ")
 
 	truck := Truck{ID: "A8U5", Capacity: 5}
-	drone := Drone{ID: "1234N", Battery: 15} //En %
+	drone := Drone{ID: "1234N", Battery: 15} // En %
 	boat := Boat{ID: "6TD4G", Weather: "Clear"}
 
 	transports := []TransportMethod{truck, drone, boat}
 	destinations := []string{"Marseille", "Belgique", "Allemagne"}
 
-	//Tester les livraisons ainsi que les statuts des transports
+	// Tester les livraisons ainsi que les statuts des transports
 	for i, transport := range transports {
-		result, err := transport.DeliverPackage(destinations[i])
-		if err != nil {
-			fmt.Println("Erreur :", err)
-		} else {
-			fmt.Println("Succès :", result)
-		}
-		fmt.Println("Statut du transport :", transport.GetStatus())
+		go func(t TransportMethod, dest string) {
+			result, err := t.DeliverPackage(dest)
+			if err != nil {
+				fmt.Println("Erreur :", err)
+			} else {
+				fmt.Println("Succès :", result)
+			}
+			fmt.Println("Statut du transport :", t.GetStatus())
+			fmt.Println("Le traitement est terminé pour la livraison à", dest)
+		}(transport, destinations[i])
 	}
 
+	// Attendre que toutes les goroutines finissent
+	time.Sleep(6 * time.Second)
+	fmt.Println("Toutes les livraisons ont été traitées.")
 }
