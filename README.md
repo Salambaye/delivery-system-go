@@ -1,3 +1,4 @@
 # delivery-system-go
-membres de groupe :
--Rostom Mouaddeb
+Membres de groupe :
+- Rostom Mouaddeb
+- Salamata Nourou MBAYE
